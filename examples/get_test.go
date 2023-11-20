@@ -22,8 +22,6 @@ func TestMain(m *testing.M) {
 
 func TestGet(t *testing.T) {
 
-	defer gohttp.StopMockServer()
-
 	t.Run("TestErrorFetchingFromGithub", func(t *testing.T) {
 		// initialization
 		gohttp.FlushMocks()

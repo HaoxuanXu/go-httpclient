@@ -6,11 +6,12 @@ import (
 )
 
 type Client interface {
-	Get(string, http.Header) (*Response, error)
-	Post(string, http.Header, interface{}) (*Response, error)
-	Put(string, http.Header, interface{}) (*Response, error)
-	Patch(string, http.Header, interface{}) (*Response, error)
-	Delete(string, http.Header) (*Response, error)
+	Get(url string, headers ...http.Header) (*Response, error)
+	Post(url string, body interface{}, headers ...http.Header) (*Response, error)
+	Put(url string, body interface{}, headers ...http.Header) (*Response, error)
+	Patch(url string, body interface{}, headers ...http.Header) (*Response, error)
+	Delete(url string, headers ...http.Header) (*Response, error)
+	Options(url string, headers ...http.Header) (*Response, error)
 }
 
 type httpClient struct {
@@ -19,21 +20,31 @@ type httpClient struct {
 	clientOnce sync.Once
 }
 
-func (h *httpClient) Get(url string, headers http.Header) (*Response, error) {
-	return h.do(http.MethodGet, url, headers, nil)
+func (h *httpClient) Get(url string, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodGet, url, requestHeaders, nil)
 }
-func (h *httpClient) Post(url string, headers http.Header, body interface{}) (*Response, error) {
-	return h.do(http.MethodPost, url, headers, body)
-}
-
-func (h *httpClient) Put(url string, headers http.Header, body interface{}) (*Response, error) {
-	return h.do(http.MethodPut, url, headers, body)
+func (h *httpClient) Post(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodPost, url, requestHeaders, body)
 }
 
-func (h *httpClient) Patch(url string, headers http.Header, body interface{}) (*Response, error) {
-	return h.do(http.MethodPatch, url, headers, body)
+func (h *httpClient) Put(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodPut, url, requestHeaders, body)
 }
 
-func (h *httpClient) Delete(url string, headers http.Header) (*Response, error) {
-	return h.do(http.MethodDelete, url, headers, nil)
+func (h *httpClient) Patch(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodPatch, url, requestHeaders, body)
+}
+
+func (h *httpClient) Delete(url string, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodDelete, url, requestHeaders, nil)
+}
+
+func (h *httpClient) Options(url string, headers ...http.Header) (*Response, error) {
+	requestHeaders := getHeaders(headers...)
+	return h.do(http.MethodOptions, url, requestHeaders, nil)
 }
